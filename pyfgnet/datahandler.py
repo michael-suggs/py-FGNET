@@ -1,5 +1,8 @@
+"""Module handling landmark loading and use.
+"""
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
+from typing import Dict, Optional, Tuple
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.patches import Circle
@@ -7,17 +10,46 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class ImageHandler:
-    """[summary]
+@dataclass
+class ImageLandmarkPair:
+    """Holds an image array and its associated landmark points array.
+
+    Attributes
+    ----------
+    image : np.ndarray
+        Image array, imported via matplotlib
+    points : np.ndarray
+        2D array (68x2) of (x,y)-points (landmark feature points)
+    """
+    image: np.ndarray
+    landmarks: np.ndarray
+
+
+class DataHandler:
+    """Handles loading and storage of image and landmark data.
+
+    Attributes
+    ----------
+    image_dir : Path
+        Relative path to directory containing the images
+    point_dir : Path
+        Relative path to directory containing landmark points for those images
+    data : Dict[str, ImageLandmarkPair], default None
+        Maps ID to dataclass containing image array and array of its
+        associated landmark points
+
+    Methods
+    -------
     """
 
     def __init__(
         self,
         image_dir: Path = Path("data/FGNET/images"),
-        points_dir: Path = Path("data/FGNET/points")
+        point_dir: Path = Path("data/FGNET/points")
     ) -> None:
         self.image_dir: Path = image_dir
-        self.points_dir: Path = points_dir
+        self.point_dir: Path = point_dir
+        self.data: Optional[Dict[str, ImageLandmarkPair]] = None
 
     @staticmethod
     def read_pts(file: Path, round: bool = False) -> np.ndarray:
@@ -57,7 +89,7 @@ class ImageHandler:
             pyplot components of labeled image, ready for display
         """
         image = plt.imread(self.image_dir.joinpath(image_id))
-        points = np.round(self.read_pts(self.points_dir.joinpath(image_id)))
+        points = np.round(self.read_pts(self.point_dir.joinpath(image_id)))
 
         ax.imshow(image)
         for (x, y) in points:

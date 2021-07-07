@@ -19,11 +19,15 @@ def read_pts(file: Path, round: bool = False) -> np.ndarray:
     np.ndarray
         Array of (x,y) coordinates, one per point
     """
+    # 68 points => 68 (x,y)-pairs
     pts = np.zeros((68, 2))
+    # open the file in read mode
     with open(file, 'r') as f:
-        lines = f.readlines()[3:-1]
-        for (i, line) in enumerate(lines):
+        # skip the first three lines and the last line
+        for (i, line) in enumerate(f.readlines()[3:-1]):
+            # split the line on the space and strip any extra whitespace
             x, y = map(lambda p: p.strip(), line.split(' '))
+            # put it in our array, rounding if desired
             pts[i, 0], pts[i, 1] = x, y if not round else round(x), round(y)
     return pts
 
@@ -41,4 +45,7 @@ def read_pts_dir(dir: Path) -> Dict[str, np.ndarray]:
     Dict[str, np.ndarray]
         Maps image/point ID to array of landmark (x,y) points for that image
     """
-    return {file.split('/')[-1]: read_pts(file) for file in listdir(dir)}
+    return {
+        file.split('/')[-1].split('.')[0]: read_pts(file)
+        for file in listdir(dir)
+    }
