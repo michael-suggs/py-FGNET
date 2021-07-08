@@ -1,6 +1,9 @@
 from os import listdir
 from pathlib import Path
 from typing import Dict, List
+from matplotlib.axes import Axes
+from matplotlib.patches import Circle
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -49,3 +52,27 @@ def read_pts_dir(dir: Path) -> Dict[str, np.ndarray]:
         file.split('/')[-1].split('.')[0]: read_pts(file)
         for file in listdir(dir)
     }
+
+
+def label_image(image: np.ndarray, landmarks: np.ndarray, ax: Axes) -> Axes:
+    """Displays landmark points on an image.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        [description]
+    landmarks : np.ndarray
+        [description]
+    ax : Axes
+        [description]
+
+    Returns
+    -------
+    Axes
+        [description]
+    """
+    ax.imshow(image)
+    for (x, y) in landmarks:
+        ax.add_patch(Circle((x, y), 5))
+
+    return ax
