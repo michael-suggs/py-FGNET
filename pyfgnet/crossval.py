@@ -27,20 +27,20 @@ class LOPOCV:
     def _(
         self, X: pd.DataFrame, y: Union[pd.DataFrame, pd.Series] = None, groups=None
     ) -> Generator[Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame], None, None]:
-        if X and y:
-            Xy = X.join(y)
-        elif not X:
-            Xy = y
-        elif not y and 'ID' in X.columns:
-            Xy = X
-        else:
-            raise Exception('Must give one of X or y')
-
+        # if X is not None and y is not None:
+        #     Xy = X.join(y)
+        # elif X is None:
+        #     Xy = y
+        # elif y is None and 'ID' in X.columns:
+        #     Xy = X
+        # else:
+        #     raise Exception('Must give one of X or y')
+        Xy = X.join(y)
         uid = Xy['ID'].unique()
         if self.shuffle:
             np.random.shuffle(uid)
 
-        for id in Xy['ID'].unique():
+        for id in uid:
             split, valset = Xy[Xy['ID'] != id], Xy[Xy['ID'] == id]
             yield split.index, valset.index
             # yield (
